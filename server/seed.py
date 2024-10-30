@@ -1,15 +1,14 @@
 from random import choice as rc
-
 from app import app
 from models import db, Hero, Power, HeroPower
 
-if __name__ == '__main__':
+def seed_database():
     with app.app_context():
         print("Clearing db...")
-        Power.query.delete()
-        Hero.query.delete()
-        HeroPower.query.delete()
+        db.drop_all()
+        db.create_all()
 
+        # Seeding powers
         print("Seeding powers...")
         powers = [
             Power(name="super strength", description="gives the wielder super-human strengths"),
@@ -17,9 +16,9 @@ if __name__ == '__main__':
             Power(name="super human senses", description="allows the wielder to use her senses at a super-human level"),
             Power(name="elasticity", description="can stretch the human body to extreme lengths"),
         ]
-
         db.session.add_all(powers)
 
+        # Seeding heroes
         print("Seeding heroes...")
         heroes = [
             Hero(name="Kamala Khan", super_name="Ms. Marvel"),
@@ -33,18 +32,21 @@ if __name__ == '__main__':
             Hero(name="Kitty Pryde", super_name="Shadowcat"),
             Hero(name="Elektra Natchios", super_name="Elektra"),
         ]
-
         db.session.add_all(heroes)
 
+        # Adding powers to heroes
         print("Adding powers to heroes...")
         strengths = ["Strong", "Weak", "Average"]
         hero_powers = []
         for hero in heroes:
             power = rc(powers)
-            hero_powers.append(
-                HeroPower(hero=hero, power=power, strength=rc(strengths))
-            )
+            hero_power = HeroPower(hero=hero, power=power, strength=rc(strengths))
+            hero_powers.append(hero_power)
         db.session.add_all(hero_powers)
-        db.session.commit()
 
+        # Commit the session
+        db.session.commit()
         print("Done seeding!")
+
+if __name__ == '__main__':
+    seed_database()

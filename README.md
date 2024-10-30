@@ -348,5 +348,3 @@ data, along with the appropriate HTTP status code:
   "errors": ["validation errors"]
 }
 ```
-# Superheroes
-
